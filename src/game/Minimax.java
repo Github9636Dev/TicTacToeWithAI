@@ -73,22 +73,39 @@ public class Minimax {
 //        for (int i = 0;i<depth;i++) prefix += "__ ";
 //
 //        System.out.println(prefix + "Board: " + Arrays.toString(board) + ", Result: " + result + ", Player: " + player + ", Move:" + move  +
-//                " " + scoreWin);
+//                ", Depth: " + depth);
 
         if (result == player) return scoreWin;
-        player = player % 2 + 1;
-        if (result == player) return scoreLose;
+        if (result == player % 2 + 1) return scoreLose;
         if (result == 3) return DRAW;
 
-        double score = 0;
-        for (int m : possibleIndexes(board)) {
-            if (player == currentPlayer) score += getScore(board.clone(), m, depth + 1,  player);
-            else score -= getScore(board.clone(), m, depth + 1,  player);
+        Map<Integer, Double> moves = new HashMap<>();
+
+        int other = player % 2 + 1;
+        for (int index : possibleIndexes(board)) {
+            moves.put(index, getScore(board.clone(), index, depth + 1, other));
         }
 
-        //FIX adding logic
+        System.out.println(moves);
 
-        return score;
+        int m = -1;
+        if (player == currentPlayer) {
+            double max = Integer.MIN_VALUE;
+            for (Map.Entry<Integer, Double> entry : moves.entrySet())
+                if (entry.getValue() > max) {
+                    max = entry.getValue();
+                    m = entry.getKey();
+                }
+        }
+        else {
+            double min = Integer.MAX_VALUE;
+            for (Map.Entry<Integer, Double> entry : moves.entrySet())
+                if (entry.getValue() < min) {
+                    min = entry.getValue();
+                    m = entry.getKey();
+                }
+        }
+        return m;
     }
 
     public int checkGameCondition(int[] b) {
